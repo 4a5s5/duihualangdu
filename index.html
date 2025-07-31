@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎙️ AI语音助手 | 智能对话+TTS服务</title>
+    <meta name="description" content="集成AI智能对话和高质量TTS语音合成的多功能Web应用">
+    <meta name="keywords" content="AI,语音助手,TTS,对话,Cloudflare">
+    
+    <!-- 预加载关键资源 -->
+    <link rel="preload" href="webui.html" as="document">
+    
+    <!-- 安全和SEO -->
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="AI Voice Assistant">
+    
+    <!-- 社交媒体 -->
+    <meta property="og:title" content="AI语音助手 | 智能对话+TTS服务">
+    <meta property="og:description" content="集成AI智能对话和高质量TTS语音合成的多功能Web应用">
+    <meta property="og:type" content="website">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b6b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+        
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 600px;
+            margin: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 1rem;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .feature p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin: 1rem 0.5rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+        
+        .loading {
+            display: none;
+            margin-top: 1rem;
+            color: #667eea;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                display: block;
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ AI语音助手</h1>
+        <p class="subtitle">智能对话 + TTS语音合成<br>一站式AI语音解决方案</p>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>🤖 AI智能对话</h3>
+                <p>支持多种AI模型，实时对话，语音朗读</p>
+            </div>
+            <div class="feature">
+                <h3>🗣️ 高质量TTS</h3>
+                <p>微软Edge语音，OpenAI兼容接口</p>
+            </div>
+            <div class="feature">
+                <h3>🚀 全球加速</h3>
+                <p>Cloudflare CDN，毫秒级响应</p>
+            </div>
+            <div class="feature">
+                <h3>🔧 调试工具</h3>
+                <p>完整日志，错误诊断，智能重试</p>
+            </div>
+        </div>
+        
+        <a href="webui.html" class="btn" onclick="showLoading()">
+            🚀 立即使用
+        </a>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            正在加载应用...
+        </div>
+    </div>
+    
+    <script>
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+        }
+        
+        // 预加载webui.html
+        window.addEventListener('load', function() {
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = 'webui.html';
+            document.head.appendChild(link);
+        });
+        
+        // 添加键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                window.location.href = 'webui.html';
+            }
+        });
+    </script>
+</body>
+</html>

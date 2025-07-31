@@ -1,0 +1,10 @@
+# Cloudflare Pages 重定向配置
+
+# 主页重定向到 webui.html
+/ /webui.html 200
+
+# API 路由重定向到 Workers（如果使用混合部署）
+/api/* https://your-worker-domain.workers.dev/:splat 200
+
+# 404 页面
+/* /webui.html 404

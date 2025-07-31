@@ -1,0 +1,33 @@
+{
+  "name": "ai-voice-assistant",
+  "version": "4.0.0",
+  "description": "AI语音助手 - 集成AI对话和TTS语音合成的多功能Web应用",
+  "main": "workers.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "tail": "wrangler tail",
+    "preview": "wrangler dev --local",
+    "build": "node scripts/build.js",
+    "start": "wrangler dev --local",
+    "prepare": "node scripts/prepare.js"
+  },
+  "keywords": [
+    "ai",
+    "tts",
+    "voice",
+    "assistant",
+    "cloudflare",
+    "workers",
+    "pages"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

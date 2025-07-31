@@ -1,0 +1,21 @@
+# Cloudflare Pages 头部配置
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# 静态资源缓存
+*.html
+  Cache-Control: public, max-age=3600
+
+*.js
+  Cache-Control: public, max-age=86400
+
+*.css
+  Cache-Control: public, max-age=86400
+
+# API 路由不缓存
+/api/*
+  Cache-Control: no-cache, no-store, must-revalidate
