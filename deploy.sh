@@ -55,13 +55,22 @@ deploy_workers() {
 # 准备Pages部署
 prepare_pages() {
     echo "📄 准备Pages部署文件..."
-    
+
     # 创建index.html作为入口文件
     if [ ! -f "index.html" ]; then
         cp webui.html index.html
         echo "✅ 创建index.html入口文件"
     fi
-    
+
+    # 检查Pages Functions
+    if [ -d "functions" ]; then
+        echo "✅ Pages Functions已准备"
+        echo "   - TTS API: /api/v1/audio/speech"
+        echo "   - 健康检查: /api/health"
+    else
+        echo "⚠️ 未找到functions目录，将只部署静态文件"
+    fi
+
     echo "✅ Pages文件准备完成"
 }
 

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功能测试 - AI语音助手</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #5a67d8; }
+    </style>
+</head>
+<body>
+    <h1>🎙️ AI语音助手功能测试</h1>
+    
+    <div class="test-card">
+        <h3>1. 语音识别支持检测</h3>
+        <button onclick="testSpeechRecognition()">测试语音识别</button>
+        <div id="speechResult"></div>
+    </div>
+    
+    <div class="test-card">
+        <h3>2. Web Audio API 支持检测</h3>
+        <button onclick="testWebAudio()">测试音频播放</button>
+        <div id="audioResult"></div>
+    </div>
+    
+    <div class="test-card">
+        <h3>3. 本地存储功能测试</h3>
+        <button onclick="testLocalStorage()">测试本地存储</button>
+        <div id="storageResult"></div>
+    </div>
+    
+    <div class="test-card">
+        <h3>4. Vue.js 加载测试</h3>
+        <button onclick="testVue()">测试Vue.js</button>
+        <div id="vueResult"></div>
+    </div>
+    
+    <div class="test-card">
+        <h3>5. 移动端适配测试</h3>
+        <p>当前屏幕宽度: <span id="screenWidth"></span>px</p>
+        <p>设备类型: <span id="deviceType"></span></p>
+        <p>触摸支持: <span id="touchSupport"></span></p>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        // 测试语音识别
+        function testSpeechRecognition() {
+            const result = document.getElementById('speechResult');
+            
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                result.innerHTML = '<div class="test-result success">✅ 浏览器支持语音识别</div>';
+                
+                try {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    const recognition = new SpeechRecognition();
+                    recognition.lang = 'zh-CN';
+                    result.innerHTML += '<div class="test-result success">✅ 语音识别对象创建成功</div>';
+                } catch (e) {
+                    result.innerHTML += '<div class="test-result error">❌ 语音识别初始化失败: ' + e.message + '</div>';
+                }
+            } else {
+                result.innerHTML = '<div class="test-result error">❌ 浏览器不支持语音识别</div>';
+            }
+        }
+        
+        // 测试Web Audio
+        function testWebAudio() {
+            const result = document.getElementById('audioResult');
+            
+            if ('Audio' in window) {
+                result.innerHTML = '<div class="test-result success">✅ 浏览器支持Audio API</div>';
+                
+                try {
+                    const audio = new Audio();
+                    audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcCC6Fy+vAeCQFJHfH8N2QOAoUXrTp66hVFApGn+PvsmEcB2m838zleBqJOnLI7t2VNgMdV7zr6KhbFg==';
+                    result.innerHTML += '<div class="test-result success">✅ Audio对象创建成功</div>';
+                } catch (e) {
+                    result.innerHTML += '<div class="test-result error">❌ Audio初始化失败: ' + e.message + '</div>';
+                }
+            } else {
+                result.innerHTML = '<div class="test-result error">❌ 浏览器不支持Audio API</div>';
+            }
+        }
+        
+        // 测试本地存储
+        function testLocalStorage() {
+            const result = document.getElementById('storageResult');
+            
+            if ('localStorage' in window) {
+                try {
+                    const testKey = 'ai_tts_test';
+                    const testValue = { test: true, timestamp: Date.now() };
+                    
+                    localStorage.setItem(testKey, JSON.stringify(testValue));
+                    const stored = JSON.parse(localStorage.getItem(testKey));
+                    
+                    if (stored.test === true) {
+                        result.innerHTML = '<div class="test-result success">✅ 本地存储功能正常</div>';
+                        localStorage.removeItem(testKey);
+                    } else {
+                        result.innerHTML = '<div class="test-result error">❌ 本地存储数据不匹配</div>';
+                    }
+                } catch (e) {
+                    result.innerHTML = '<div class="test-result error">❌ 本地存储失败: ' + e.message + '</div>';
+                }
+            } else {
+                result.innerHTML = '<div class="test-result error">❌ 浏览器不支持本地存储</div>';
+            }
+        }
+        
+        // 测试Vue.js
+        function testVue() {
+            const result = document.getElementById('vueResult');
+            
+            if (typeof Vue !== 'undefined') {
+                result.innerHTML = '<div class="test-result success">✅ Vue.js 加载成功</div>';
+                
+                try {
+                    const { createApp } = Vue;
+                    const app = createApp({
+                        data() {
+                            return { message: 'Vue test successful' };
+                        }
+                    });
+                    result.innerHTML += '<div class="test-result success">✅ Vue应用创建成功</div>';
+                } catch (e) {
+                    result.innerHTML += '<div class="test-result error">❌ Vue应用创建失败: ' + e.message + '</div>';
+                }
+            } else {
+                result.innerHTML = '<div class="test-result error">❌ Vue.js 未加载</div>';
+            }
+        }
+        
+        // 初始化移动端信息
+        function initMobileInfo() {
+            document.getElementById('screenWidth').textContent = window.screen.width;
+            
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            document.getElementById('deviceType').textContent = isMobile ? '移动设备' : '桌面设备';
+            
+            const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            document.getElementById('touchSupport').textContent = hasTouch ? '支持' : '不支持';
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', initMobileInfo);
+    </script>
+</body>
+</html>

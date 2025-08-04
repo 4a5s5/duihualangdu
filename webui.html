@@ -1593,6 +1593,158 @@
       color: var(--gray);
       margin-top: 0.25rem;
     }
+    
+    /* 增强的移动端优化和美观改进 */
+    @media (max-width: 768px) {
+      /* 聊天输入区域移动端优化 */
+      .chat-input-area {
+        position: sticky;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+      }
+      
+      .chat-input-area .input-group {
+        gap: 0.5rem;
+      }
+      
+      .chat-input-area .btn {
+        width: 40px;
+        height: 40px;
+        margin-left: 0;
+        font-size: 1rem;
+      }
+      
+      /* 语音输入移动端优化 */
+      .voice-input-indicator {
+        font-size: 0.85rem;
+        padding: 0.4rem;
+        border-radius: 6px;
+      }
+      
+      .voice-wave-animation .wave {
+        width: 2px;
+        height: 12px;
+      }
+      
+      /* 模式切换按钮移动端优化 */
+      .mode-toggle {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .mode-toggle .btn {
+        justify-content: center;
+        padding: 0.8rem 0.5rem;
+        font-size: 0.85rem;
+        border-radius: 12px;
+      }
+      
+      /* 消息气泡移动端优化 */
+      .message {
+        margin-bottom: 1rem;
+      }
+      
+      .message-content {
+        max-width: 85%;
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+      
+      .message-controls .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+        border-radius: 6px;
+      }
+      
+      /* 聊天区域移动端优化 */
+      .chat-area {
+        height: calc(100vh - 250px);
+        border-radius: 15px;
+      }
+      
+      .chat-messages {
+        padding: 1rem;
+        padding-bottom: 2rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 1rem;
+        margin: 0.5rem;
+        border-radius: 15px;
+      }
+      
+      .mode-toggle {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+      
+      .chat-input-area textarea {
+        font-size: 16px; /* 防止iOS缩放 */
+      }
+      
+      .message-content {
+        max-width: 90%;
+        font-size: 0.85rem;
+      }
+      
+      .voice-control-panel h3 {
+        font-size: 1.1rem;
+      }
+    }
+    
+    /* 高级美观效果 */
+    .chat-container {
+      background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.05) 0%, 
+        rgba(118, 75, 162, 0.05) 50%,
+        rgba(255, 154, 158, 0.05) 100%);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .chat-area {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    /* 动画效果增强 */
+    .btn {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateZ(0); /* 硬件加速 */
+    }
+    
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn:active {
+      transform: translateY(0) scale(0.98);
+      transition: all 0.1s ease;
+    }
+    
+    /* 输入框美化 */
+    .chat-input-area textarea {
+      border: 2px solid transparent;
+      background: linear-gradient(white, white) padding-box,
+                  linear-gradient(135deg, var(--primary-color), var(--secondary-color)) border-box;
+      transition: all 0.3s ease;
+    }
+    
+    .chat-input-area textarea:focus {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+    }
   </style>
 </head>
 
@@ -1656,8 +1808,8 @@
               <div class="message-content">
                 {{ message.content }}
                 <div v-if="message.role === 'assistant'" class="message-controls">
-                  <button class="btn btn-sm btn-outline-primary" 
-                          @click="speakText(message.content)"
+                  <button class="btn btn-sm btn-outline-primary"
+                          @click="speakMessageText(message.content)"
                           :disabled="isGeneratingVoice">
                     <i class="fas fa-volume-up"></i> 朗读
                   </button>
@@ -1682,15 +1834,33 @@
             <div class="input-group">
               <textarea v-model="chatInput"
                         @keydown.enter.exact.prevent="sendMessage()"
-                        placeholder="输入你想说的话..."
+                        placeholder="输入你想说的话或点击语音按钮..."
                         rows="2"
                         :disabled="isThinking"></textarea>
               <div class="input-group-append">
+                <button class="btn btn-secondary"
+                        @click="toggleVoiceInput()"
+                        :class="{ 'btn-danger': isListening }"
+                        :disabled="isThinking"
+                        v-show="speechRecognitionSupported"
+                        :title="isListening ? '点击停止录音' : '点击开始语音输入'">
+                  <i :class="isListening ? 'fas fa-stop' : 'fas fa-microphone'"></i>
+                </button>
                 <button class="btn btn-primary"
                         @click="sendMessage()"
                         :disabled="isThinking || !chatInput.trim()">
                   <i class="fas fa-paper-plane"></i>
                 </button>
+              </div>
+            </div>
+            <div v-if="isListening" class="voice-input-indicator mt-2">
+              <div class="d-flex align-items-center">
+                <div class="voice-wave-animation">
+                  <div class="wave"></div>
+                  <div class="wave"></div>
+                  <div class="wave"></div>
+                </div>
+                <span class="ml-2 text-muted">正在监听中... 请说话</span>
               </div>
             </div>
           </div>
@@ -1796,12 +1966,34 @@
             </button>
           </div>
 
+          <!-- 语音参数状态指示器 -->
+          <div class="voice-status mt-2" v-if="currentAudioParams">
+            <small class="text-muted d-flex align-items-center justify-content-between">
+              <span>
+                <i class="fas fa-microphone"></i>
+                {{ currentAudioParams.voice.split('-')[2] || '默认' }} |
+                {{ currentAudioParams.speed }}x |
+                音调{{ currentAudioParams.pitch }}
+              </span>
+              <span v-if="hasAudioParamsChanged()" class="text-warning">
+                <i class="fas fa-exclamation-triangle"></i> 设置已变更
+              </span>
+            </small>
+          </div>
+
           <div class="form-check mt-3">
-            <input class="form-check-input" type="checkbox" 
+            <input class="form-check-input" type="checkbox"
                    id="autoSpeak" v-model="chatSettings.autoSpeak">
             <label class="form-check-label" for="autoSpeak">
               自动朗读AI回复
             </label>
+          </div>
+
+          <div class="mt-3 p-2 bg-light rounded">
+            <small class="text-muted">
+              <i class="fas fa-info-circle"></i>
+              更改语音设置后，点击暂停/停止再重播将使用新设置
+            </small>
           </div>
           
 
@@ -2043,6 +2235,53 @@
       align-items: center;
       justify-content: center;
       margin-left: 0.5rem;
+    }
+
+    /* 语音输入相关样式 */
+    .voice-input-indicator {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem;
+      background: rgba(245, 101, 101, 0.1);
+      border-radius: 8px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { background-color: rgba(245, 101, 101, 0.1); }
+      50% { background-color: rgba(245, 101, 101, 0.2); }
+      100% { background-color: rgba(245, 101, 101, 0.1); }
+    }
+
+    .voice-wave-animation {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .voice-wave-animation .wave {
+      width: 3px;
+      height: 15px;
+      background: #f56565;
+      border-radius: 2px;
+      animation: wave 1.2s ease-in-out infinite;
+    }
+
+    .voice-wave-animation .wave:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+
+    .voice-wave-animation .wave:nth-child(3) {
+      animation-delay: 0.2s;
+    }
+
+    @keyframes wave {
+      0%, 40%, 100% {
+        transform: scaleY(0.4);
+      }
+      20% {
+        transform: scaleY(1);
+      }
     }
 
     /* 语音控制面板样式 */
@@ -2477,7 +2716,20 @@
           pauseTime: 1.0,
           config: {
             baseUrl: 'https://你的域名',
-            apiKey: '你的密钥'
+            apiKey: '你的密钥',
+            autoSelectEndpoint: true,
+            endpoints: [
+              {
+                name: 'Pages Functions',
+                url: 'https://your-project.pages.dev/api',
+                description: '国内外都可访问'
+              },
+              {
+                name: '自定义域名',
+                url: 'https://api.yourdomain.com',
+                description: '自定义域名，可配置国内DNS'
+              }
+            ]
           },
           form: {
             inputText: '请在这里输入文本，目前尽可能不要超过1点5万字每次，不然会报错。音色映射可以自行修改workers的配置',
@@ -2505,6 +2757,9 @@
           isThinking: false,
           isGeneratingVoice: false,
           currentAudio: null,
+          currentAudioText: '', // 当前播放音频对应的文本
+          currentAudioParams: null, // 当前播放音频的参数
+          audioCache: new Map(), // 音频缓存，key为文本+参数hash
           showAISettings: false,
           
           // AI 设置
@@ -2533,7 +2788,13 @@
             speed: 1.0,
             pitch: 1.0,
             autoSpeak: true
-          }
+          },
+          
+          // 语音输入相关
+          speechRecognitionSupported: false,
+          isListening: false,
+          recognition: null,
+          voiceInputEnabled: true
         }
       },
       computed: {
@@ -2552,6 +2813,57 @@
         switchMode(mode) {
           this.currentMode = mode;
           this.saveSettings();
+        },
+        
+        // 语音输入功能
+        initSpeechRecognition() {
+          if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            this.speechRecognitionSupported = true;
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            this.recognition = new SpeechRecognition();
+            
+            this.recognition.lang = 'zh-CN';
+            this.recognition.continuous = false;
+            this.recognition.interimResults = false;
+            this.recognition.maxAlternatives = 1;
+            
+            this.recognition.onstart = () => {
+              this.isListening = true;
+              this.addDebugLog('info', '语音识别开始');
+            };
+            
+            this.recognition.onresult = (event) => {
+              const transcript = event.results[0][0].transcript;
+              this.chatInput = transcript;
+              this.addDebugLog('success', '语音识别结果', { transcript });
+            };
+            
+            this.recognition.onerror = (event) => {
+              this.addDebugLog('error', '语音识别错误', { error: event.error });
+              this.updateStatus('语音识别失败: ' + event.error, 'error');
+            };
+            
+            this.recognition.onend = () => {
+              this.isListening = false;
+              this.addDebugLog('info', '语音识别结束');
+            };
+          } else {
+            this.speechRecognitionSupported = false;
+            this.addDebugLog('warning', '浏览器不支持语音识别');
+          }
+        },
+        
+        toggleVoiceInput() {
+          if (!this.speechRecognitionSupported) {
+            this.updateStatus('浏览器不支持语音识别功能', 'error');
+            return;
+          }
+          
+          if (this.isListening) {
+            this.recognition.stop();
+          } else {
+            this.recognition.start();
+          }
         },
         
         // AI 对话功能
@@ -2615,7 +2927,22 @@
 
             // 自动朗读AI回复
             if (this.chatSettings.autoSpeak) {
-              await this.speakText(aiResponse);
+              // 增加防护措施，确保自动朗读状态正确
+              this.addDebugLog('info', '开始自动朗读AI回复', {
+                autoSpeak: this.chatSettings.autoSpeak,
+                textLength: aiResponse.length
+              });
+              
+              try {
+                await this.speakText(aiResponse);
+              } catch (speakError) {
+                this.addDebugLog('error', '自动朗读失败', { error: speakError.message });
+                console.error('自动朗读失败:', speakError);
+              }
+            } else {
+              this.addDebugLog('info', '自动朗读已禁用，跳过朗读', {
+                autoSpeak: this.chatSettings.autoSpeak
+              });
             }
 
           } catch (error) {
@@ -2835,29 +3162,118 @@
           return aiResponse;
         },
         
+        // 生成音频参数哈希
+        getAudioParamsHash(text, voice, speed, pitch) {
+          const params = `${text}|${voice}|${speed}|${pitch}`;
+          // 简单哈希函数
+          let hash = 0;
+          for (let i = 0; i < params.length; i++) {
+            const char = params.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // 转换为32位整数
+          }
+          return hash.toString();
+        },
+
+        // 清理音频缓存
+        clearAudioCache() {
+          // 清理所有缓存的音频URL
+          for (const [key, audioData] of this.audioCache.entries()) {
+            if (audioData.url) {
+              URL.revokeObjectURL(audioData.url);
+            }
+          }
+          this.audioCache.clear();
+          this.addDebugLog('info', '音频缓存已清理');
+        },
+
+        // 智能选择最佳API端点
+        async selectBestEndpoint() {
+          if (!this.config.autoSelectEndpoint || !this.config.endpoints) {
+            return this.config.baseUrl;
+          }
+
+          for (const endpoint of this.config.endpoints) {
+            try {
+              const response = await fetch(`${endpoint.url}/health`, {
+                method: 'GET',
+                timeout: 3000
+              });
+
+              if (response.ok) {
+                console.log(`✅ 使用端点: ${endpoint.name}`);
+                this.addDebugLog('success', `自动选择API端点: ${endpoint.name}`, {
+                  url: endpoint.url,
+                  description: endpoint.description
+                });
+                return endpoint.url;
+              }
+            } catch (error) {
+              console.log(`❌ 端点不可用: ${endpoint.name}`);
+              continue;
+            }
+          }
+
+          // 如果所有端点都不可用，使用默认配置
+          console.log('⚠️ 所有端点测试失败，使用默认配置');
+          this.addDebugLog('warning', '所有备用端点不可用，使用默认配置');
+          return this.config.baseUrl;
+        },
+
         // 语音朗读功能
-        async speakText(text) {
+        async speakText(text, forceRegenerate = false) {
           if (this.isGeneratingVoice) return;
-          
+
           try {
             this.isGeneratingVoice = true;
-            
+
+            const voice = this.chatSettings.voice;
+            const speed = this.chatSettings.speed;
+            const pitch = this.chatSettings.pitch;
+
+            // 生成缓存键
+            const cacheKey = this.getAudioParamsHash(text, voice, speed, pitch);
+
+            // 检查缓存（除非强制重新生成）
+            if (!forceRegenerate && this.audioCache.has(cacheKey)) {
+              const cachedAudio = this.audioCache.get(cacheKey);
+              this.addDebugLog('info', '使用缓存音频', {
+                text: text.substring(0, 50) + '...',
+                voice: voice,
+                speed: speed,
+                pitch: pitch
+              });
+
+              // 播放缓存的音频
+              await this.playAudioFromUrl(cachedAudio.url, text, { voice, speed, pitch });
+              return;
+            }
+
+            this.addDebugLog('info', '生成新音频', {
+              text: text.substring(0, 50) + '...',
+              voice: voice,
+              speed: speed,
+              pitch: pitch,
+              forceRegenerate: forceRegenerate
+            });
+
             const requestBody = {
-              voice: this.chatSettings.voice,
+              voice: voice,
               input: text,
-              speed: this.chatSettings.speed,
-              pitch: this.chatSettings.pitch,
+              speed: speed,
+              pitch: pitch,
               stream: false
             };
-            
-            const baseUrl = this.config.baseUrl.trim();
+
+            // 智能选择最佳端点
+            const bestEndpoint = await this.selectBestEndpoint();
             const apiKey = this.config.apiKey.trim();
-            
-            if (!baseUrl || !apiKey) {
+
+            if (!bestEndpoint || !apiKey) {
               throw new Error('请先配置TTS API');
             }
-            
-            const response = await fetch(baseUrl + '/v1/audio/speech', {
+
+            const response = await fetch(bestEndpoint + '/v1/audio/speech', {
               method: 'POST',
               headers: {
                 'Authorization': 'Bearer ' + apiKey,
@@ -2865,23 +3281,25 @@
               },
               body: JSON.stringify(requestBody),
             });
-            
+
             if (!response.ok) {
               throw new Error(`语音生成失败: ${response.status}`);
             }
-            
+
             const blob = await response.blob();
             const audioUrl = URL.createObjectURL(blob);
-            
+
+            // 缓存音频
+            this.audioCache.set(cacheKey, {
+              url: audioUrl,
+              text: text,
+              params: { voice, speed, pitch },
+              timestamp: Date.now()
+            });
+
             // 播放音频
-            if (this.currentAudio) {
-              this.currentAudio.pause();
-              URL.revokeObjectURL(this.currentAudio.src);
-            }
-            
-            this.currentAudio = new Audio(audioUrl);
-            await this.currentAudio.play();
-            
+            await this.playAudioFromUrl(audioUrl, text, { voice, speed, pitch });
+
           } catch (error) {
             console.error('语音朗读失败:', error);
             this.updateStatus('语音朗读失败: ' + error.message, 'error');
@@ -2889,29 +3307,125 @@
             this.isGeneratingVoice = false;
           }
         },
+
+        // 从URL播放音频
+        async playAudioFromUrl(audioUrl, text, params) {
+          // 停止当前播放的音频
+          if (this.currentAudio) {
+            this.currentAudio.pause();
+            // 不要立即清理URL，因为可能是缓存的
+          }
+
+          this.currentAudio = new Audio(audioUrl);
+          this.currentAudioText = text;
+          this.currentAudioParams = params;
+
+          // 添加音频事件监听
+          this.currentAudio.addEventListener('ended', () => {
+            this.addDebugLog('info', '音频播放完成');
+          });
+
+          this.currentAudio.addEventListener('error', (e) => {
+            this.addDebugLog('error', '音频播放错误', { error: e.message });
+          });
+
+          await this.currentAudio.play();
+        },
+
+        // 朗读消息文本（检查是否需要重新生成）
+        async speakMessageText(text) {
+          // 如果当前正在播放相同文本但参数不同，强制重新生成
+          const forceRegenerate = (
+            this.currentAudioText === text &&
+            this.hasAudioParamsChanged()
+          );
+
+          if (forceRegenerate) {
+            this.addDebugLog('info', '消息朗读：检测到参数变化，重新生成', {
+              text: text.substring(0, 50) + '...',
+              oldParams: this.currentAudioParams,
+              newParams: {
+                voice: this.chatSettings.voice,
+                speed: this.chatSettings.speed,
+                pitch: this.chatSettings.pitch
+              }
+            });
+          }
+
+          await this.speakText(text, forceRegenerate);
+        },
         
+        // 检查当前音频参数是否已变化
+        hasAudioParamsChanged() {
+          if (!this.currentAudioParams) return false;
+
+          return (
+            this.currentAudioParams.voice !== this.chatSettings.voice ||
+            this.currentAudioParams.speed !== this.chatSettings.speed ||
+            this.currentAudioParams.pitch !== this.chatSettings.pitch
+          );
+        },
+
         // 音频控制
-        playAudio() {
-          if (this.currentAudio && this.currentAudio.paused) {
+        async playAudio() {
+          if (!this.currentAudio) return;
+
+          // 检查参数是否变化，如果变化则重新生成
+          if (this.hasAudioParamsChanged() && this.currentAudioText) {
+            this.addDebugLog('info', '检测到语音参数变化，重新生成音频', {
+              oldParams: this.currentAudioParams,
+              newParams: {
+                voice: this.chatSettings.voice,
+                speed: this.chatSettings.speed,
+                pitch: this.chatSettings.pitch
+              }
+            });
+
+            await this.speakText(this.currentAudioText, true); // 强制重新生成
+            return;
+          }
+
+          if (this.currentAudio.paused) {
             this.currentAudio.play();
           }
         },
-        
+
         pauseAudio() {
           if (this.currentAudio && !this.currentAudio.paused) {
             this.currentAudio.pause();
+            this.addDebugLog('info', '音频已暂停', {
+              autoSpeak: this.chatSettings.autoSpeak // 记录当前自动朗读状态
+            });
           }
         },
-        
+
         stopAudio() {
           if (this.currentAudio) {
             this.currentAudio.pause();
             this.currentAudio.currentTime = 0;
+            this.addDebugLog('info', '音频已停止', {
+              autoSpeak: this.chatSettings.autoSpeak // 记录当前自动朗读状态
+            });
           }
         },
-        
-        replayAudio() {
-          if (this.currentAudio) {
+
+        async replayAudio() {
+          if (!this.currentAudio || !this.currentAudioText) return;
+
+          // 检查参数是否变化，如果变化则重新生成
+          if (this.hasAudioParamsChanged()) {
+            this.addDebugLog('info', '重播时检测到语音参数变化，重新生成音频', {
+              oldParams: this.currentAudioParams,
+              newParams: {
+                voice: this.chatSettings.voice,
+                speed: this.chatSettings.speed,
+                pitch: this.chatSettings.pitch
+              }
+            });
+
+            await this.speakText(this.currentAudioText, true); // 强制重新生成
+          } else {
+            // 参数未变化，直接重播
             this.currentAudio.currentTime = 0;
             this.currentAudio.play();
           }
@@ -3494,20 +4008,54 @@
           });
         }
       },
+      watch: {
+        // 监听聊天语音设置变化
+        'chatSettings.voice'() {
+          this.onVoiceSettingsChanged();
+        },
+        'chatSettings.speed'() {
+          this.onVoiceSettingsChanged();
+        },
+        'chatSettings.pitch'() {
+          this.onVoiceSettingsChanged();
+        }
+      },
       mounted() {
         this.loadConfig();
         this.loadForm();
         this.loadSettings();
         this.loadChatHistory();
+        this.initSpeechRecognition();
 
         // 添加初始调试日志
         this.addDebugLog('info', '系统初始化完成', {
-          version: '1.0.0',
+          version: '4.0.0',
           timestamp: new Date().toISOString(),
           baseUrl: this.aiSettings.baseUrl,
-          model: this.aiSettings.model
+          model: this.aiSettings.model,
+          speechRecognitionSupported: this.speechRecognitionSupported
         });
       },
+        // 语音设置改变处理
+        onVoiceSettingsChanged() {
+          // 保存设置
+          this.saveSettings();
+
+          // 清理音频缓存，因为参数已改变
+          this.clearAudioCache();
+
+          this.addDebugLog('info', '语音设置已更新', {
+            voice: this.chatSettings.voice,
+            speed: this.chatSettings.speed,
+            pitch: this.chatSettings.pitch,
+            autoSpeak: this.chatSettings.autoSpeak
+          });
+
+          // 如果当前有音频在播放，标记参数已过期
+          if (this.currentAudio && this.currentAudioParams) {
+            this.addDebugLog('info', '当前音频参数已过期，下次播放将重新生成');
+          }
+        },
       beforeUnmount() {
         // 清理URL对象，避免内存泄漏
         if (this.audioSrc) {

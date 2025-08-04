@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎙️ 语音设置修复验证</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+            color: #2d3748;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+        }
+
+        .problem {
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #ef4444;
+        }
+
+        .solution {
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #10b981;
+        }
+
+        .feature {
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .feature h3 {
+            color: #3b82f6;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-block {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .test-steps {
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .test-steps h3 {
+            color: #f59e0b;
+            margin-top: 0;
+        }
+
+        .test-steps ol {
+            padding-left: 1.5rem;
+        }
+
+        .test-steps li {
+            margin-bottom: 0.8rem;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .before, .after {
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .before {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+        }
+
+        .after {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+        }
+
+        .before h4 {
+            color: #ef4444;
+            margin-top: 0;
+        }
+
+        .after h4 {
+            color: #10b981;
+            margin-top: 0;
+        }
+
+        .highlight {
+            background: #fef3c7;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ 语音设置修复验证报告</h1>
+        
+        <div class="problem">
+            <h2>🚨 问题描述</h2>
+            <p><strong>现象：</strong>在对话界面中，更换语音和调节语速语调均无效</p>
+            <p><strong>原因：</strong>音频播放使用的是缓存的音频，没有根据新设置重新生成</p>
+            <p><strong>影响：</strong>用户无法实时体验不同的语音设置效果</p>
+        </div>
+
+        <div class="solution">
+            <h2>🛠️ 解决方案</h2>
+            <p>实现了智能音频缓存和参数变化检测机制：</p>
+            <ul>
+                <li><strong>参数哈希缓存</strong>：为每个文本+参数组合生成唯一缓存</li>
+                <li><strong>变化检测</strong>：实时检测语音设置是否变化</li>
+                <li><strong>智能重播</strong>：参数变化时自动重新生成音频</li>
+                <li><strong>状态指示</strong>：显示当前音频参数和变化状态</li>
+            </ul>
+        </div>
+
+        <div class="feature">
+            <h3><i>🧠</i> 智能音频缓存系统</h3>
+            <p><strong>功能：</strong>基于文本内容和语音参数生成缓存键</p>
+            <div class="code-block">
+// 生成音频参数哈希
+getAudioParamsHash(text, voice, speed, pitch) {
+  const params = `${text}|${voice}|${speed}|${pitch}`;
+  // 生成唯一哈希值
+  return hash.toString();
+}
+
+// 音频缓存结构
+audioCache: new Map() // key: hash, value: { url, text, params, timestamp }
+            </div>
+            <p><strong>优势：</strong>相同参数的音频复用缓存，不同参数重新生成</p>
+        </div>
+
+        <div class="feature">
+            <h3><i>🔍</i> 参数变化检测</h3>
+            <p><strong>功能：</strong>实时监听语音设置变化</p>
+            <div class="code-block">
+// Vue watch监听器
+watch: {
+  'chatSettings.voice'() { this.onVoiceSettingsChanged(); },
+  'chatSettings.speed'() { this.onVoiceSettingsChanged(); },
+  'chatSettings.pitch'() { this.onVoiceSettingsChanged(); }
+}
+
+// 检查参数是否变化
+hasAudioParamsChanged() {
+  return (
+    this.currentAudioParams.voice !== this.chatSettings.voice ||
+    this.currentAudioParams.speed !== this.chatSettings.speed ||
+    this.currentAudioParams.pitch !== this.chatSettings.pitch
+  );
+}
+            </div>
+            <p><strong>效果：</strong>设置变化时立即清理缓存，确保使用新参数</p>
+        </div>
+
+        <div class="feature">
+            <h3><i>🔄</i> 智能重播机制</h3>
+            <p><strong>功能：</strong>播放/重播时自动检测参数变化</p>
+            <div class="comparison">
+                <div class="before">
+                    <h4>❌ 修复前</h4>
+                    <div class="code-block">
+async replayAudio() {
+  // 直接重播缓存音频
+  this.currentAudio.currentTime = 0;
+  this.currentAudio.play();
+}
+                    </div>
+                    <p>总是使用旧参数的音频</p>
+                </div>
+                <div class="after">
+                    <h4>✅ 修复后</h4>
+                    <div class="code-block">
+async replayAudio() {
+  // 检查参数是否变化
+  if (this.hasAudioParamsChanged()) {
+    // 重新生成音频
+    await this.speakText(this.currentAudioText, true);
+  } else {
+    // 参数未变化，直接重播
+    this.currentAudio.currentTime = 0;
+    this.currentAudio.play();
+  }
+}
+                    </div>
+                    <p>智能判断是否需要重新生成</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature">
+            <h3><i>📊</i> 状态指示器</h3>
+            <p><strong>功能：</strong>显示当前音频参数和变化状态</p>
+            <div class="code-block">
+&lt;div class="voice-status" v-if="currentAudioParams"&gt;
+  &lt;small class="text-muted"&gt;
+    &lt;i class="fas fa-microphone"&gt;&lt;/i&gt;
+    {{ currentAudioParams.voice.split('-')[2] }} | 
+    {{ currentAudioParams.speed }}x | 
+    音调{{ currentAudioParams.pitch }}
+    &lt;span v-if="hasAudioParamsChanged()" class="text-warning"&gt;
+      &lt;i class="fas fa-exclamation-triangle"&gt;&lt;/i&gt; 设置已变更
+    &lt;/span&gt;
+  &lt;/small&gt;
+&lt;/div&gt;
+            </div>
+            <p><strong>效果：</strong>用户可以清楚看到当前音频状态和是否需要重新生成</p>
+        </div>
+
+        <div class="test-steps">
+            <h3>🧪 测试步骤</h3>
+            <ol>
+                <li><strong>启动AI对话</strong>
+                    <ul>
+                        <li>发送消息给AI</li>
+                        <li>等待AI回复并自动播放语音</li>
+                    </ul>
+                </li>
+                <li><strong>更改语音设置</strong>
+                    <ul>
+                        <li>在聊天设置中更换语音（如从晓晓改为云希）</li>
+                        <li>调整语速（如从1.0改为1.5）</li>
+                        <li>调整音调（如从1.0改为1.2）</li>
+                    </ul>
+                </li>
+                <li><strong>测试重播功能</strong>
+                    <ul>
+                        <li>点击"重播"按钮</li>
+                        <li>应该听到使用新设置的语音</li>
+                        <li>查看状态指示器确认参数更新</li>
+                    </ul>
+                </li>
+                <li><strong>测试暂停/播放</strong>
+                    <ul>
+                        <li>点击"暂停"按钮</li>
+                        <li>再次更改语音设置</li>
+                        <li>点击"播放"按钮</li>
+                        <li>应该重新生成并播放新设置的语音</li>
+                    </ul>
+                </li>
+                <li><strong>验证缓存机制</strong>
+                    <ul>
+                        <li>不更改设置，多次重播同一段文本</li>
+                        <li>应该使用缓存，播放速度很快</li>
+                        <li>查看调试面板确认"使用缓存音频"日志</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="feature">
+            <h3><i>🎯</i> 预期效果</h3>
+            <ul>
+                <li>✅ <strong>实时生效</strong>：更改语音设置后立即生效</li>
+                <li>✅ <strong>智能缓存</strong>：相同参数复用缓存，提高性能</li>
+                <li>✅ <strong>状态清晰</strong>：用户可以看到当前音频参数</li>
+                <li>✅ <strong>变化提示</strong>：设置变化时显示警告图标</li>
+                <li>✅ <strong>自动重生成</strong>：播放/重播时自动检测并重新生成</li>
+                <li>✅ <strong>调试友好</strong>：详细的日志记录缓存和重生成过程</li>
+            </ul>
+        </div>
+
+        <div class="feature">
+            <h3><i>🔧</i> 技术细节</h3>
+            <ul>
+                <li><strong>缓存策略</strong>：基于文本+语音+语速+音调的组合哈希</li>
+                <li><strong>内存管理</strong>：自动清理过期的音频URL，防止内存泄漏</li>
+                <li><strong>性能优化</strong>：只在参数变化时重新生成，否则复用缓存</li>
+                <li><strong>用户体验</strong>：提供清晰的状态指示和操作反馈</li>
+                <li><strong>错误处理</strong>：完善的错误日志和用户提示</li>
+            </ul>
+        </div>
+
+        <div class="problem">
+            <h3>⚠️ 注意事项</h3>
+            <ul>
+                <li><strong>缓存清理</strong>：语音设置变化时会清理所有缓存</li>
+                <li><strong>网络消耗</strong>：参数变化会重新请求API生成音频</li>
+                <li><strong>响应延迟</strong>：重新生成音频需要等待API响应</li>
+                <li><strong>存储空间</strong>：音频缓存会占用浏览器内存</li>
+            </ul>
+        </div>
+
+        <div class="solution">
+            <h3>🎉 修复完成</h3>
+            <p>现在您可以：</p>
+            <ul>
+                <li>🎙️ <strong>实时调整语音</strong>：更改设置后立即生效</li>
+                <li>🔄 <strong>智能重播</strong>：自动使用最新设置</li>
+                <li>📊 <strong>状态监控</strong>：清楚了解当前音频状态</li>
+                <li>⚡ <strong>性能优化</strong>：智能缓存提高响应速度</li>
+            </ul>
+            <p><strong>开始体验全新的语音交互功能吧！</strong> 🎉</p>
+        </div>
+    </div>
+</body>
+</html>

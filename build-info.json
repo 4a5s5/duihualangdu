@@ -1,0 +1,10 @@
+{
+  "buildTime": "2025-08-04T08:23:55.653Z",
+  "version": "4.0.0",
+  "files": [
+    "webui.html",
+    "workers.js",
+    "_headers",
+    "_redirects"
+  ]
+}
